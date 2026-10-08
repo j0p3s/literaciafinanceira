@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Investir PT · IE</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f766e">
+<style>
+  :root{
+    --bg:#f5f7f6; --card:#ffffff; --text:#1c2321; --muted:#5b6662;
+    --accent:#0f766e; --accent-soft:#d9f0ec; --bad:#b91c1c;
+    --border:#e2e8e5; --radius:14px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0f1413; --card:#18201e; --text:#e8eeec; --muted:#9aa8a3;
+      --accent:#2dd4bf; --accent-soft:#123a35; --bad:#f87171; --border:#26302d;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+       font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.55}
+  header{position:sticky;top:0;z-index:5;background:#0f766e;color:#fff;
+         padding:12px 16px;display:flex;align-items:center;gap:10px}
+  header h1{font-size:1.05rem;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  header button{background:rgba(255,255,255,.18);border:0;color:#fff;
+                padding:6px 12px;border-radius:999px;font-size:.9rem;cursor:pointer;white-space:nowrap}
+  main{max-width:720px;margin:0 auto;padding:16px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+        padding:16px;margin-bottom:12px}
+  .module{display:flex;align-items:center;gap:14px;cursor:pointer}
+  .module .icon{font-size:1.7rem;width:48px;height:48px;display:grid;place-items:center;
+                background:var(--accent-soft);border-radius:12px;flex-shrink:0}
+  .module h3{margin:0 0 2px;font-size:1rem}
+  .module p{margin:0;color:var(--muted);font-size:.88rem}
+  .section{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:20px 4px 8px}
+  h2{font-size:1.3rem;margin:4px 0 12px}
+  .lesson h4{margin:18px 0 6px;color:var(--accent)}
+  .lesson p,.lesson li{font-size:.97rem}
+  .tip{background:var(--accent-soft);border-left:4px solid var(--accent);
+       padding:10px 12px;border-radius:8px;margin:12px 0;font-size:.93rem}
+  .warn{background:rgba(185,28,28,.08);border-left:4px solid var(--bad);
+        padding:10px 12px;border-radius:8px;margin:12px 0;font-size:.93rem}
+  table{width:100%;border-collapse:collapse;font-size:.92rem;margin:8px 0}
+  td,th{padding:6px 8px;border-bottom:1px solid var(--border);text-align:left}
+  .choice{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .choice.three{grid-template-columns:1fr 1fr 1fr}
+  .choice button{padding:14px 8px;border-radius:12px;border:2px solid var(--border);
+                 background:var(--card);color:var(--text);cursor:pointer;font-size:.95rem}
+  .choice button .big{display:block;font-size:1.8rem;margin-bottom:4px}
+  .choice button.active{border-color:var(--accent);background:var(--accent-soft);font-weight:600}
+  .btn{display:block;width:100%;padding:13px;border:0;border-radius:12px;
+       background:var(--accent);color:#fff;font-size:1rem;font-weight:600;cursor:pointer;margin-top:16px}
+  @media (prefers-color-scheme: dark){ .btn{color:#0f1413} }
+  label{display:block;font-size:.9rem;margin:12px 0 4px;color:var(--muted)}
+  input{width:100%;padding:11px;border:2px solid var(--border);border-radius:10px;
+        font-size:1rem;background:var(--card);color:var(--text)}
+  .result{font-size:1.05rem;margin-top:14px}
+  .result b{color:var(--accent)}
+  .note{color:var(--muted);font-size:.85rem}
+  .tabs{display:flex;gap:8px;margin-bottom:14px}
+  .tabs button{flex:1;padding:10px 6px;border-radius:10px;border:2px solid var(--border);
+               background:var(--card);color:var(--text);cursor:pointer;font-size:.88rem}
+  .tabs button.active{border-color:var(--accent);color:var(--accent);font-weight:600}
+  .gl dt{font-weight:600;margin-top:12px}
+  .gl dd{margin:2px 0 0;color:var(--muted);font-size:.93rem}
+  .src{padding-left:18px;font-size:.88rem}
+  .src li{margin:6px 0}
+  .src a{color:var(--accent);word-break:break-word}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding:20px 16px 40px}
+</style>
+</head>
+<body>
+<header>
+  <button id="backBtn" style="display:none" onclick="goHome()">‹</button>
+  <h1 id="title"></h1>
+  <button id="setBtn" onclick="openSettings()"></button>
+</header>
+<main id="app"></main>
+<footer id="foot"></footer>
+
+<script>
+/* =====================================================================
+   TEXTOS DA INTERFACE
+   ===================================================================== */
+const UI = {
+  'pt-PT': {
+    appTitle:'Investir com cabeça', back:'‹ Voltar',
+    common:'Para todos', country:{ie:'Irlanda', pt:'Portugal'},
+    calcTitle:'Calculadoras', calcSub:'Juros compostos e simuladores de impostos', srcTitle:'Fontes', srcSub:'De onde vem esta informação',
+    glTitle:'Glossário', glSub:'Os termos que aparecem no grupo',
+    settings:'Definições', lang:'Língua', where:'Onde investes?', save:'Guardar',
+    welcome:'Bem-vindo! Escolhe a língua e o país onde és residente fiscal.', start:'Começar',
+    foot:'Conteúdo educativo, não é aconselhamento financeiro. As regras fiscais mudam todos os anos — confirma sempre nas Finanças / Revenue ou com um profissional. Atualizado: outubro 2026.',
+    tCompound:'Juros compostos', tDD:'Regra dos 8 anos', tPRSA:'PRSA', tMV:'Mais-valias', tPPR:'PPR',
+    initial:'Investimento inicial (€)', monthly:'Contribuição mensal (€)', ret:'Retorno anual esperado (%)', years:'Anos',
+    final:'Valor final', invested:'Investido por ti', gain:'Ganho', beforeTax:'Antes de impostos.',
+    amount:'Valor investido (€)', after8:'Valor ao fim de 8 anos', taxDue:'Imposto a pagar (38%)',
+    ddNote:'Tens de ter este dinheiro disponível, ou vender parte do ETF para pagar.',
+    age:'Idade', salary:'Salário bruto anual (€)', marg:'Taxa de imposto marginal (20 ou 40)',
+    prsaMax:'Limite com alívio fiscal', perYear:'/ano', ofSalary:'do salário', relief:'Alívio fiscal', realCost:'Custo real para ti',
+    prsaNote:'Salário considerado até €115.000.',
+    buy:'Valor de compra + comissões (€)', sell:'Valor de venda (€)', held:'Anos de detenção',
+    excl:'Parte excluída', taxable:'Valor tributável', tax28:'IRS a 28%',
+    mvNote:'Taxa autónoma de 28%. Não inclui a opção de englobamento.',
+    yearly:'Entrega anual no PPR (€)', deduction:'Dedução no IRS', toMax:'Para chegar ao máximo entrega',
+    pprNote:'A dedução abate diretamente ao imposto, mas entra no limite global de deduções do agregado.'
+  },
+  'pt-BR': {
+    appTitle:'Investir com consciência', back:'‹ Voltar',
+    common:'Para todos', country:{ie:'Irlanda', pt:'Portugal'},
+    calcTitle:'Calculadoras', calcSub:'Juros compostos e simuladores de impostos', srcTitle:'Fontes', srcSub:'De onde vem esta informação',
+    glTitle:'Glossário', glSub:'Os termos que aparecem no grupo',
+    settings:'Configurações', lang:'Idioma', where:'Onde você investe?', save:'Salvar',
+    welcome:'Bem-vindo! Escolha o idioma e o país onde você é residente fiscal.', start:'Começar',
+    foot:'Conteúdo educativo, não é aconselhamento financeiro. As regras fiscais mudam todo ano — confirme sempre nas Finanças / Revenue ou com um profissional. Atualizado: outubro 2026.',
+    tCompound:'Juros compostos', tDD:'Regra dos 8 anos', tPRSA:'PRSA', tMV:'Ganho de capital', tPPR:'PPR',
+    initial:'Investimento inicial (€)', monthly:'Aporte mensal (€)', ret:'Retorno anual esperado (%)', years:'Anos',
+    final:'Valor final', invested:'Investido por você', gain:'Ganho', beforeTax:'Antes dos impostos.',
+    amount:'Valor investido (€)', after8:'Valor depois de 8 anos', taxDue:'Imposto a pagar (38%)',
+    ddNote:'Você precisa ter esse dinheiro disponível, ou vender parte do ETF para pagar.',
+    age:'Idade', salary:'Salário bruto anual (€)', marg:'Alíquota marginal (20 ou 40)',
+    prsaMax:'Limite com benefício fiscal', perYear:'/ano', ofSalary:'do salário', relief:'Benefício fiscal', realCost:'Custo real para você',
+    prsaNote:'Salário considerado até €115.000.',
+    buy:'Valor de compra + taxas (€)', sell:'Valor de venda (€)', held:'Anos que você manteve',
+    excl:'Parte excluída', taxable:'Valor tributável', tax28:'IRS a 28%',
+    mvNote:'Alíquota fixa de 28%. Não inclui a opção de englobamento.',
+    yearly:'Aporte anual no PPR (€)', deduction:'Dedução no IRS', toMax:'Para chegar ao máximo, aporte',
+    pprNote:'A dedução abate direto do imposto, mas entra no limite global de deduções da família.'
+  },
+  'en': {
+    appTitle:'Invest wisely', back:'‹ Back',
+    common:'For everyone', country:{ie:'Ireland', pt:'Portugal'},
+    calcTitle:'Calculators', calcSub:'Compound interest and tax simulators', srcTitle:'Sources', srcSub:'Where this information comes from',
+    glTitle:'Glossary', glSub:'Terms that come up in the group',
+    settings:'Settings', lang:'Language', where:'Where do you invest?', save:'Save',
+    welcome:'Welcome! Pick your language and the country where you are tax resident.', start:'Start',
+    foot:'Educational content, not financial advice. Tax rules change every year — always check with Revenue / Finanças or a professional. Updated: October 2026.',
+    tCompound:'Compound interest', tDD:'8-year rule', tPRSA:'PRSA', tMV:'Capital gains', tPPR:'PPR',
+    initial:'Initial investment (€)', monthly:'Monthly contribution (€)', ret:'Expected annual return (%)', years:'Years',
+    final:'Final value', invested:'Paid in by you', gain:'Gain', beforeTax:'Before tax.',
+    amount:'Amount invested (€)', after8:'Value after 8 years', taxDue:'Tax due (38%)',
+    ddNote:'You need this cash available, or sell part of the ETF to pay it.',
+    age:'Age', salary:'Gross annual salary (€)', marg:'Marginal tax rate (20 or 40)',
+    prsaMax:'Max with tax relief', perYear:'/year', ofSalary:'of salary', relief:'Tax relief', realCost:'Real cost to you',
+    prsaNote:'Salary counted up to €115,000.',
+    buy:'Purchase cost + fees (€)', sell:'Sale value (€)', held:'Years held',
+    excl:'Excluded portion', taxable:'Taxable amount', tax28:'IRS at 28%',
+    mvNote:'Flat 28% rate. Does not include the englobamento option.',
+    yearly:'Yearly PPR contribution (€)', deduction:'IRS deduction', toMax:'To reach the max, contribute',
+    pprNote:'The deduction comes straight off your tax bill, but counts toward the household overall deduction cap.'
+  }
+};
+
+/* =====================================================================
+   CONTEÚDO — PORTUGUÊS DE PORTUGAL
+   ===================================================================== */
+const PT_PT = {
+common:[
+{ id:'basicos', icon:'🧱', title:'O básico', sub:'Juros compostos, risco e por onde começar', body:`
+<h4>Antes de investir</h4>
+<ul>
+<li><b>Fundo de emergência</b> — 3 a 6 meses de despesas numa conta poupança, acessível a qualquer momento.</li>
+<li><b>Sem dívidas caras</b> — cartão de crédito ou crédito pessoal a 10–20% custam mais do que o mercado costuma render.</li>
+</ul>
+<h4>Juros compostos</h4>
+<p>Os ganhos geram novos ganhos. €200/mês durante 30 anos a 7% ao ano dão cerca de <b>€240.000</b>, dos quais só €72.000 saíram do teu bolso. Começar cedo vale mais do que começar com muito.</p>
+<h4>Risco e retorno</h4>
+<p>Mais retorno esperado vem sempre com mais oscilação. Ações podem cair 30–50% num ano mau. Historicamente o mercado recupera, mas isso não é garantido.</p>
+<h4>Diversificação</h4>
+<p>Em vez de comprar 3 empresas, compras milhares de uma vez através de um ETF.</p>
+<div class="tip">💡 Dinheiro de que vais precisar nos próximos 3–5 anos não deve estar em ações.</div>`},
+{ id:'etf', icon:'📊', title:'ETFs', sub:'O que são e como escolher', body:`
+<h4>O que é um ETF?</h4>
+<p>Um <b>Exchange Traded Fund</b> é um cesto de ações (ou obrigações) que se compra na bolsa como uma única ação. Um ETF do índice mundial dá-te pequenas partes de milhares de empresas.</p>
+<h4>Porque são populares</h4>
+<ul>
+<li><b>Diversificação</b> instantânea</li>
+<li><b>Custos baixos</b> — comissão anual (TER) de 0,07%–0,25%</li>
+<li><b>Simplicidade</b> — não precisas de escolher empresas</li>
+</ul>
+<h4>UCITS e domicílio</h4>
+<p>Na Europa compras ETFs <b>UCITS</b>. Muitos estão domiciliados na Irlanda (ISIN começa por <b>IE</b>), o que reduz o imposto retido sobre dividendos americanos de 30% para 15% dentro do fundo.</p>
+<h4>Acumulação vs Distribuição</h4>
+<ul>
+<li><b>Acumulação (Acc)</b> — os dividendos são reinvestidos automaticamente. Sem imposto enquanto não vendes.</li>
+<li><b>Distribuição (Dist)</b> — os dividendos caem na conta e são tributados todos os anos.</li>
+</ul>
+<div class="tip">💡 Tanto em Portugal como na Irlanda, os ETFs de <b>acumulação</b> costumam ser a opção mais eficiente para o longo prazo.</div>`},
+],
+ie:[
+{ id:'ie-etf', icon:'🧾', title:'Impostos nos ETFs', sub:'Exit tax 38% e a regra dos 8 anos', body:`
+<h4>Exit Tax: 38%</h4>
+<p>Na Irlanda, os ganhos em ETFs europeus não pagam CGT — pagam <b>Exit Tax</b>, que desceu de 41% para <b>38%</b> a 1 de janeiro de 2026. Os dividendos de ETFs de distribuição também pagam 38%.</p>
+<h4>Deemed Disposal (regra dos 8 anos)</h4>
+<p>A cada 8 anos depois de cada compra, a Revenue <b>considera que vendeste</b> e pagas 38% sobre o ganho — mesmo sem venderes.</p>
+<p><b>Exemplo:</b> investes €10.000 em 2026. Em 2034 vale €18.000. Pagas 38% × €8.000 = <b>€3.040</b> e continuas com o ETF. Na venda final esse valor é descontado.</p>
+<div class="warn">⚠️ Cada compra tem a sua própria data de 8 anos. Quem investe todos os meses tem de controlar cada lote. Guarda todos os extratos.</div>
+<div class="tip">🇮🇪 vs 🇵🇹 Em Portugal não existe esta regra: só se paga quando se vende, e quem mantém 8 anos ou mais tem até 30% do ganho excluído de imposto.</div>
+<h4>Perdas não compensam</h4>
+<p>Perdas num ETF <b>não</b> podem ser abatidas a ganhos noutro ETF, nem a ganhos em ações.</p>
+<h4>Como declarar</h4>
+<p>No <b>Form 11</b>, normalmente até 31 de outubro do ano seguinte — mesmo que só tenhas rendimentos PAYE.</p>
+<h4>Nova Conta de Investimento</h4>
+<p>Está prevista para 2027 uma conta pessoal (estilo ISA britânico) para residentes com 18+ anos e PPSN, uma por pessoa. Dentro dela <b>não há deemed disposal</b>: há um limite isento e uma taxa anual baixa acima dele, calculada pelo banco/corretora. Confirma os valores definidos no Orçamento 2027.</p>`},
+{ id:'ie-acoes', icon:'📈', title:'Ações individuais', sub:'CGT, dividendos e perdas', body:`
+<h4>Capital Gains Tax (CGT): 33%</h4>
+<p>Ganhos com a venda de ações individuais (e de ETFs dos EUA) pagam <b>CGT a 33%</b>.</p>
+<h4>Isenção anual: €1.270</h4>
+<p>Os primeiros <b>€1.270</b> de ganhos por ano, por pessoa, estão isentos. Não acumula de ano para ano.</p>
+<h4>Perdas compensam</h4>
+<p>Ao contrário dos ETFs, as perdas abatem aos ganhos do mesmo ano e as que sobram passam para os anos seguintes.</p>
+<h4>Prazos de pagamento</h4>
+<ul>
+<li>Ganhos de janeiro a novembro → pagar até <b>15 de dezembro</b></li>
+<li>Ganhos de dezembro → pagar até <b>31 de janeiro</b></li>
+<li>Declarar no Form 11 (ou Form 12 se só tens PAYE) até 31 de outubro do ano seguinte</li>
+</ul>
+<h4>Dividendos</h4>
+<p>Tributados como <b>rendimento</b>: taxa marginal (20% ou 40%) + USC + PRSI. Empresas irlandesas retêm 25% na fonte, que depois é descontado. Para ações americanas preenche o <b>W-8BEN</b> para a retenção nos EUA baixar para 15%.</p>
+<div class="tip">💡 Ações pagam menos imposto do que ETFs (33% vs 38%), mas têm muito mais risco. Ninguém deve escolher ações só por causa dos impostos.</div>`},
+{ id:'ie-prsa', icon:'🏖️', title:'PRSA e reforma', sub:'Investir com benefício fiscal', body:`
+<h4>O que é um PRSA?</h4>
+<p><b>Personal Retirement Savings Account</b> — conta individual de reforma. É tua, segue-te se mudares de emprego e investe normalmente em fundos.</p>
+<h4>Alívio fiscal à entrada</h4>
+<p>O que contribuis sai do rendimento antes de imposto. Na taxa de 40%, cada <b>€100</b> custa-te <b>€60</b>. Na de 20%, custa €80.</p>
+<h4>Limites por idade (% do salário bruto)</h4>
+<table><tr><th>Idade</th><th>Limite</th></tr>
+<tr><td>Até 29</td><td>15%</td></tr><tr><td>30–39</td><td>20%</td></tr><tr><td>40–49</td><td>25%</td></tr>
+<tr><td>50–54</td><td>30%</td></tr><tr><td>55–59</td><td>35%</td></tr><tr><td>60+</td><td>40%</td></tr></table>
+<p>Salário considerado até <b>€115.000</b>.</p>
+<h4>Dentro do PRSA</h4>
+<p>Os ganhos crescem <b>sem imposto</b> — sem Exit Tax, sem deemed disposal, sem CGT.</p>
+<h4>Na reforma</h4>
+<ul>
+<li>Acesso normalmente entre os <b>60 e os 75 anos</b>.</li>
+<li>Até <b>25%</b> de uma vez; os primeiros <b>€200.000</b> desse montante são isentos.</li>
+<li>O resto vai para um ARF ou anuidade e é tributado como rendimento quando levantas.</li>
+</ul>
+<div class="warn">⚠️ O dinheiro fica preso até à reforma.</div>
+<div class="tip">💡 Se o teu empregador contribui para a pensão, aproveita sempre o máximo que ele iguala.</div>`},
+],
+pt:[
+{ id:'pt-mv', icon:'🧾', title:'Mais-valias', sub:'28%, englobamento e a regra do tempo', body:`
+<h4>Taxa de 28%</h4>
+<p>Ganhos na venda de ações e ETFs pagam <b>28%</b> (taxa autónoma) sobre o saldo do ano: soma de ganhos menos perdas.</p>
+<h4>Não há regra dos 8 anos</h4>
+<p>Ao contrário da Irlanda, em Portugal <b>só pagas quando vendes</b>. Com ETFs de acumulação, podes manter o investimento décadas sem pagar nada pelo caminho.</p>
+<h4>Bónus por manter mais tempo</h4>
+<p>Para ações cotadas e ETFs, parte do ganho fica excluída de imposto conforme o tempo que os detiveste:</p>
+<table><tr><th>Tempo</th><th>Parte excluída</th></tr>
+<tr><td>Menos de 2 anos</td><td>0%</td></tr><tr><td>2 a 5 anos</td><td>10%</td></tr>
+<tr><td>5 a 8 anos</td><td>20%</td></tr><tr><td>8 anos ou mais</td><td>30%</td></tr></table>
+<p><b>Exemplo:</b> ganho de €5.000 num ETF detido 6 anos → só €4.000 tributáveis → €1.120 de imposto em vez de €1.400.</p>
+<div class="tip">🇵🇹 vs 🇮🇪 Um contraste curioso: na Irlanda, manter um ETF 8 anos <b>obriga</b> a pagar imposto (deemed disposal). Em Portugal, manter 8 anos dá <b>desconto</b> de 30% no ganho tributável.</div>
+<h4>Englobamento</h4>
+<p>Podes optar por somar os ganhos aos outros rendimentos e pagar à taxa do teu escalão. Só compensa se a tua taxa marginal for <b>inferior a 28%</b>. Se optares, todas as mais-valias do ano entram.</p>
+<div class="warn">⚠️ Englobamento <b>obrigatório</b>: ganhos de ativos detidos <b>menos de 365 dias</b>, quando o rendimento total chega ao último escalão do IRS (cerca de €86.600 em 2026).</div>
+<h4>Perdas</h4>
+<p>Compensam ganhos do mesmo ano. Só passam para os 5 anos seguintes se optares pelo englobamento.</p>
+<h4>Como declarar</h4>
+<ul>
+<li>IRS entre <b>1 de abril e 30 de junho</b> do ano seguinte.</li>
+<li>Corretora portuguesa → <b>Anexo G</b>. Corretora estrangeira (DEGIRO, IBKR, Trading 212…) → <b>Anexo J</b>.</li>
+<li>Contas em corretoras estrangeiras também têm de ser indicadas no Anexo J.</li>
+<li>Regra <b>FIFO</b>: vendem-se primeiro as unidades compradas há mais tempo.</li>
+</ul>`},
+{ id:'pt-div', icon:'💸', title:'Dividendos e juros', sub:'Retenção a 28% e dupla tributação', body:`
+<h4>Dividendos: 28%</h4>
+<p>Dividendos e juros pagam <b>28%</b>. Em bancos e corretoras portuguesas o imposto é retido na fonte e não tens de fazer mais nada (a não ser que queiras englobar).</p>
+<h4>Dividendos estrangeiros</h4>
+<p>O país da empresa retém primeiro a sua parte. Portugal cobra a diferença até aos 28%.</p>
+<p><b>Exemplo EUA:</b> com o formulário <b>W-8BEN</b> os EUA retêm 15%; Portugal cobra os restantes 13%. Sem W-8BEN retêm 30% — e recuperar o excesso é difícil.</p>
+<h4>Juros de depósitos e Certificados</h4>
+<p>Também 28%, retidos na fonte automaticamente.</p>
+<div class="tip">💡 Com ETFs de acumulação não recebes dividendos, logo não há imposto anual. O imposto fica todo para a venda — e beneficia da exclusão por tempo de detenção.</div>`},
+{ id:'pt-ppr', icon:'🏖️', title:'PPR', sub:'Plano Poupança Reforma', body:`
+<h4>O que é um PPR?</h4>
+<p>Um produto de poupança para a reforma. Pode ser um fundo (com ações e obrigações) ou um seguro. Escolhe pelo tipo de investimento e pelas comissões.</p>
+<h4>Dedução no IRS</h4>
+<p>Abates <b>20%</b> do que entregas diretamente ao imposto, até um máximo por idade:</p>
+<table><tr><th>Idade</th><th>Dedução máx.</th><th>Entrega para a esgotar</th></tr>
+<tr><td>Menos de 35</td><td>€400</td><td>€2.000</td></tr>
+<tr><td>35 a 50</td><td>€350</td><td>€1.750</td></tr>
+<tr><td>Mais de 50</td><td>€300</td><td>€1.500</td></tr></table>
+<p>A dedução vale o mesmo em qualquer escalão, mas entra no limite global de deduções do agregado.</p>
+<h4>Resgate sem penalização</h4>
+<p>A partir dos 60 anos ou na reforma, e em situações como desemprego de longa duração, doença grave ou incapacidade — com as entregas a terem, em regra, pelo menos 5 anos. Nesses casos os ganhos pagam cerca de <b>8%</b> de imposto.</p>
+<div class="warn">⚠️ Resgate fora das condições: devolves as deduções que tiveste, mais <b>10% por cada ano</b> desde que as usaste, e os ganhos pagam mais imposto.</div>
+<div class="tip">💡 Para quem tem horizonte longo, um PPR de ações com comissões baixas junta o benefício fiscal ao crescimento do mercado.</div>`},
+],
+glossary:[
+['ETF','Fundo cotado em bolsa que replica um índice ou cesto de ativos.'],
+['UCITS','Regras da UE para fundos vendidos a particulares.'],
+['ISIN','Código de 12 caracteres que identifica um investimento.'],
+['TER','Custo anual do fundo, em % do valor investido.'],
+['Acc / Dist','Acumulação (reinveste dividendos) ou Distribuição (paga-os).'],
+['W-8BEN','Formulário dos EUA que reduz a retenção sobre dividendos para 15%.'],
+['FIFO','First In, First Out: vendem-se primeiro as unidades mais antigas.'],
+['Corretora','Plataforma onde se compram ações e ETFs.'],
+],
+glIE:[
+['Exit Tax','Imposto de 38% sobre ganhos em fundos/ETFs na Irlanda.'],
+['Deemed Disposal','Venda fictícia a cada 8 anos, com Exit Tax sobre o ganho.'],
+['CGT','Capital Gains Tax: 33% sobre ganhos em ações.'],
+['Form 11','Declaração para quem tem rendimentos fora do PAYE.'],
+['PRSA','Conta individual de reforma com alívio fiscal.'],
+['ARF','Fundo onde a pensão continua investida depois da reforma.'],
+],
+glPT:[
+['Mais-valia','Ganho na venda de um ativo. Categoria G do IRS.'],
+['Taxa autónoma','Taxa fixa de 28%, separada dos outros rendimentos.'],
+['Englobamento','Somar os ganhos aos outros rendimentos e pagar à taxa do escalão.'],
+['Anexo J','Anexo do IRS para rendimentos e contas no estrangeiro.'],
+['Anexo G','Anexo do IRS para mais-valias.'],
+['PPR','Plano Poupança Reforma, com dedução no IRS.'],
+]
+};
+
+/* =====================================================================
+   CONTEÚDO — PORTUGUÊS DO BRASIL
+   ===================================================================== */
+const PT_BR = {
+common:[
+{ id:'basicos', icon:'🧱', title:'O básico', sub:'Juros compostos, risco e por onde começar', body:`
+<h4>Antes de investir</h4>
+<ul>
+<li><b>Reserva de emergência</b> — 3 a 6 meses de despesas numa conta poupança, com acesso a qualquer momento.</li>
+<li><b>Sem dívidas caras</b> — cartão de crédito ou empréstimo pessoal a 10–20% custam mais do que o mercado costuma render.</li>
+</ul>
+<h4>Juros compostos</h4>
+<p>Os ganhos geram novos ganhos. €200/mês durante 30 anos a 7% ao ano dão cerca de <b>€240.000</b>, sendo que só €72.000 saíram do seu bolso. Começar cedo vale mais do que começar com muito.</p>
+<h4>Risco e retorno</h4>
+<p>Mais retorno esperado sempre vem com mais oscilação. Ações podem cair 30–50% num ano ruim. Historicamente o mercado se recupera, mas isso não é garantido.</p>
+<h4>Diversificação</h4>
+<p>Em vez de comprar 3 empresas, você compra milhares de uma vez por meio de um ETF.</p>
+<div class="tip">💡 Dinheiro que você vai precisar nos próximos 3–5 anos não deve ficar em ações.</div>`},
+{ id:'etf', icon:'📊', title:'ETFs', sub:'O que são e como escolher', body:`
+<h4>O que é um ETF?</h4>
+<p>Um <b>Exchange Traded Fund</b> é uma cesta de ações (ou títulos) negociada na bolsa como se fosse uma única ação. Um ETF do índice mundial te dá pequenas partes de milhares de empresas.</p>
+<h4>Por que são populares</h4>
+<ul>
+<li><b>Diversificação</b> instantânea</li>
+<li><b>Custo baixo</b> — taxa de administração anual (TER) de 0,07%–0,25%</li>
+<li><b>Simplicidade</b> — você não precisa escolher empresas</li>
+</ul>
+<h4>UCITS e domicílio</h4>
+<p>Na Europa você compra ETFs <b>UCITS</b>. Muitos são domiciliados na Irlanda (ISIN começa com <b>IE</b>), o que reduz o imposto retido sobre dividendos americanos de 30% para 15% dentro do fundo.</p>
+<h4>Acumulação vs Distribuição</h4>
+<ul>
+<li><b>Acumulação (Acc)</b> — os dividendos são reinvestidos automaticamente. Sem imposto enquanto você não vender.</li>
+<li><b>Distribuição (Dist)</b> — os dividendos caem na conta e são tributados todo ano.</li>
+</ul>
+<div class="tip">💡 Tanto em Portugal quanto na Irlanda, os ETFs de <b>acumulação</b> costumam ser a opção mais eficiente para o longo prazo.</div>`},
+],
+ie:[
+{ id:'ie-etf', icon:'🧾', title:'Impostos nos ETFs', sub:'Exit tax 38% e a regra dos 8 anos', body:`
+<h4>Exit Tax: 38%</h4>
+<p>Na Irlanda, o ganho em ETFs europeus não paga CGT — paga <b>Exit Tax</b>, que caiu de 41% para <b>38%</b> em 1º de janeiro de 2026. Os dividendos de ETFs de distribuição também pagam 38%.</p>
+<h4>Deemed Disposal (regra dos 8 anos)</h4>
+<p>A cada 8 anos depois de cada compra, a Revenue <b>considera que você vendeu</b> e cobra 38% sobre o ganho — mesmo sem você vender nada.</p>
+<p><b>Exemplo:</b> você investe €10.000 em 2026. Em 2034 vale €18.000. Você paga 38% × €8.000 = <b>€3.040</b> e continua com o ETF. Na venda final esse valor é descontado.</p>
+<div class="warn">⚠️ Cada compra tem sua própria data de 8 anos. Quem investe todo mês precisa controlar cada lote. Guarde todos os extratos.</div>
+<div class="tip">🇮🇪 vs 🇵🇹 Em Portugal essa regra não existe: só se paga quando vende, e quem mantém 8 anos ou mais tem até 30% do ganho excluído do imposto.</div>
+<h4>Prejuízo não compensa</h4>
+<p>Prejuízo num ETF <b>não</b> pode ser abatido do ganho em outro ETF, nem do ganho em ações.</p>
+<h4>Como declarar</h4>
+<p>No <b>Form 11</b>, normalmente até 31 de outubro do ano seguinte — mesmo que você só tenha renda PAYE.</p>
+<h4>Nova Conta de Investimento</h4>
+<p>Está prevista para 2027 uma conta pessoal (estilo ISA britânico) para residentes com 18+ anos e PPSN, uma por pessoa. Dentro dela <b>não existe deemed disposal</b>: há um limite isento e uma alíquota anual baixa acima dele, calculada pelo banco/corretora. Confirme os valores definidos no Orçamento 2027.</p>`},
+{ id:'ie-acoes', icon:'📈', title:'Ações individuais', sub:'CGT, dividendos e prejuízos', body:`
+<h4>Capital Gains Tax (CGT): 33%</h4>
+<p>O ganho na venda de ações individuais (e de ETFs americanos) paga <b>CGT de 33%</b>.</p>
+<h4>Isenção anual: €1.270</h4>
+<p>Os primeiros <b>€1.270</b> de ganho por ano, por pessoa, são isentos. Não acumula de um ano para outro.</p>
+<h4>Prejuízo compensa</h4>
+<p>Diferente dos ETFs, o prejuízo abate o ganho do mesmo ano e o que sobrar passa para os anos seguintes.</p>
+<h4>Prazos de pagamento</h4>
+<ul>
+<li>Ganhos de janeiro a novembro → pagar até <b>15 de dezembro</b></li>
+<li>Ganhos de dezembro → pagar até <b>31 de janeiro</b></li>
+<li>Declarar no Form 11 (ou Form 12 se só tem PAYE) até 31 de outubro do ano seguinte</li>
+</ul>
+<h4>Dividendos</h4>
+<p>Tributados como <b>renda</b>: alíquota marginal (20% ou 40%) + USC + PRSI. Empresas irlandesas retêm 25% na fonte, que depois é descontado. Para ações americanas preencha o <b>W-8BEN</b> para a retenção nos EUA cair para 15%.</p>
+<div class="tip">💡 Ações pagam menos imposto do que ETFs (33% vs 38%), mas têm muito mais risco. Ninguém deve escolher ações só por causa do imposto.</div>`},
+{ id:'ie-prsa', icon:'🏖️', title:'PRSA e aposentadoria', sub:'Investir com benefício fiscal', body:`
+<h4>O que é um PRSA?</h4>
+<p><b>Personal Retirement Savings Account</b> — conta individual de aposentadoria. É sua, vai com você se mudar de emprego e normalmente investe em fundos.</p>
+<h4>Benefício fiscal na entrada</h4>
+<p>O que você aporta sai da renda antes do imposto. Na alíquota de 40%, cada <b>€100</b> custa só <b>€60</b>. Na de 20%, custa €80.</p>
+<h4>Limites por idade (% do salário bruto)</h4>
+<table><tr><th>Idade</th><th>Limite</th></tr>
+<tr><td>Até 29</td><td>15%</td></tr><tr><td>30–39</td><td>20%</td></tr><tr><td>40–49</td><td>25%</td></tr>
+<tr><td>50–54</td><td>30%</td></tr><tr><td>55–59</td><td>35%</td></tr><tr><td>60+</td><td>40%</td></tr></table>
+<p>Salário considerado até <b>€115.000</b>.</p>
+<h4>Dentro do PRSA</h4>
+<p>Os ganhos crescem <b>sem imposto</b> — sem Exit Tax, sem deemed disposal, sem CGT.</p>
+<h4>Na aposentadoria</h4>
+<ul>
+<li>Acesso normalmente entre <b>60 e 75 anos</b>.</li>
+<li>Até <b>25%</b> de uma vez; os primeiros <b>€200.000</b> desse valor são isentos.</li>
+<li>O restante vai para um ARF ou anuidade e é tributado como renda quando você saca.</li>
+</ul>
+<div class="warn">⚠️ O dinheiro fica preso até a aposentadoria.</div>
+<div class="tip">💡 Se o seu empregador contribui para a previdência, aproveite sempre o máximo que ele iguala.</div>`},
+],
+pt:[
+{ id:'pt-mv', icon:'🧾', title:'Ganho de capital', sub:'28%, englobamento e a regra do tempo', body:`
+<h4>Alíquota de 28%</h4>
+<p>O ganho na venda de ações e ETFs (as "mais-valias") paga <b>28%</b> (taxa autónoma) sobre o saldo do ano: ganhos menos prejuízos.</p>
+<h4>Não existe regra dos 8 anos</h4>
+<p>Diferente da Irlanda, em Portugal <b>você só paga quando vende</b>. Com ETFs de acumulação, dá para manter o investimento por décadas sem pagar nada no caminho.</p>
+<h4>Bônus por manter mais tempo</h4>
+<p>Para ações listadas e ETFs, parte do ganho fica fora do imposto conforme o tempo que você manteve:</p>
+<table><tr><th>Tempo</th><th>Parte excluída</th></tr>
+<tr><td>Menos de 2 anos</td><td>0%</td></tr><tr><td>2 a 5 anos</td><td>10%</td></tr>
+<tr><td>5 a 8 anos</td><td>20%</td></tr><tr><td>8 anos ou mais</td><td>30%</td></tr></table>
+<p><b>Exemplo:</b> ganho de €5.000 num ETF mantido por 6 anos → só €4.000 tributáveis → €1.120 de imposto em vez de €1.400.</p>
+<div class="tip">🇵🇹 vs 🇮🇪 Um contraste curioso: na Irlanda, manter um ETF por 8 anos <b>obriga</b> a pagar imposto (deemed disposal). Em Portugal, manter 8 anos dá <b>desconto</b> de 30% no ganho tributável.</div>
+<h4>Englobamento</h4>
+<p>Você pode somar os ganhos às outras rendas e pagar pela alíquota da sua faixa. Só vale a pena se a sua alíquota marginal for <b>menor que 28%</b>. Se optar, todos os ganhos do ano entram.</p>
+<div class="warn">⚠️ Englobamento <b>obrigatório</b>: ganhos de ativos mantidos <b>menos de 365 dias</b>, quando a renda total chega à última faixa do IRS (cerca de €86.600 em 2026).</div>
+<h4>Prejuízos</h4>
+<p>Compensam ganhos do mesmo ano. Só passam para os 5 anos seguintes se você optar pelo englobamento.</p>
+<h4>Como declarar</h4>
+<ul>
+<li>IRS entre <b>1º de abril e 30 de junho</b> do ano seguinte.</li>
+<li>Corretora portuguesa → <b>Anexo G</b>. Corretora estrangeira (DEGIRO, IBKR, Trading 212…) → <b>Anexo J</b>.</li>
+<li>Contas em corretoras estrangeiras também precisam ser informadas no Anexo J.</li>
+<li>Regra <b>FIFO</b>: vendem-se primeiro as cotas compradas há mais tempo.</li>
+</ul>`},
+{ id:'pt-div', icon:'💸', title:'Dividendos e juros', sub:'Retenção de 28% e bitributação', body:`
+<h4>Dividendos: 28%</h4>
+<p>Dividendos e juros pagam <b>28%</b>. Em bancos e corretoras portuguesas o imposto é retido na fonte e você não precisa fazer mais nada (a não ser que queira englobar).</p>
+<h4>Dividendos do exterior</h4>
+<p>O país da empresa retém a parte dele primeiro. Portugal cobra a diferença até 28%.</p>
+<p><b>Exemplo EUA:</b> com o formulário <b>W-8BEN</b> os EUA retêm 15%; Portugal cobra os outros 13%. Sem W-8BEN retêm 30% — e recuperar o excesso é complicado.</p>
+<h4>Juros de depósitos e Certificados</h4>
+<p>Também 28%, retidos na fonte automaticamente.</p>
+<div class="tip">💡 Com ETFs de acumulação você não recebe dividendos, então não há imposto anual. O imposto fica todo para a venda — e aproveita a exclusão pelo tempo de investimento.</div>`},
+{ id:'pt-ppr', icon:'🏖️', title:'PPR', sub:'Plano Poupança Reforma (previdência)', body:`
+<h4>O que é um PPR?</h4>
+<p>Um produto de previdência para a aposentadoria. Pode ser um fundo (com ações e títulos) ou um seguro. Escolha pelo tipo de investimento e pelas taxas.</p>
+<h4>Dedução no IRS</h4>
+<p>Você abate <b>20%</b> do que aporta direto do imposto, até um máximo por idade:</p>
+<table><tr><th>Idade</th><th>Dedução máx.</th><th>Aporte para atingir</th></tr>
+<tr><td>Menos de 35</td><td>€400</td><td>€2.000</td></tr>
+<tr><td>35 a 50</td><td>€350</td><td>€1.750</td></tr>
+<tr><td>Mais de 50</td><td>€300</td><td>€1.500</td></tr></table>
+<p>A dedução vale o mesmo em qualquer faixa, mas entra no limite global de deduções da família.</p>
+<h4>Resgate sem penalidade</h4>
+<p>A partir dos 60 anos ou na aposentadoria, e em casos como desemprego de longa duração, doença grave ou invalidez — com os aportes tendo, em regra, pelo menos 5 anos. Nesses casos os ganhos pagam cerca de <b>8%</b> de imposto.</p>
+<div class="warn">⚠️ Resgate fora das condições: você devolve as deduções que teve, mais <b>10% por ano</b> desde que as usou, e os ganhos pagam mais imposto.</div>
+<div class="tip">💡 Para quem tem horizonte longo, um PPR de ações com taxas baixas junta o benefício fiscal ao crescimento do mercado.</div>`},
+],
+glossary:[
+['ETF','Fundo negociado em bolsa que replica um índice ou cesta de ativos.'],
+['UCITS','Regras da UE para fundos vendidos a pessoas físicas.'],
+['ISIN','Código de 12 caracteres que identifica um investimento.'],
+['TER','Custo anual do fundo, em % do valor investido.'],
+['Acc / Dist','Acumulação (reinveste dividendos) ou Distribuição (paga).'],
+['W-8BEN','Formulário dos EUA que reduz a retenção sobre dividendos para 15%.'],
+['FIFO','First In, First Out: vendem-se primeiro as cotas mais antigas.'],
+['Corretora','Plataforma onde se compram ações e ETFs.'],
+],
+glIE:[
+['Exit Tax','Imposto de 38% sobre ganhos em fundos/ETFs na Irlanda.'],
+['Deemed Disposal','Venda fictícia a cada 8 anos, com Exit Tax sobre o ganho.'],
+['CGT','Capital Gains Tax: 33% sobre ganhos em ações.'],
+['Form 11','Declaração para quem tem renda fora do PAYE.'],
+['PRSA','Conta individual de aposentadoria com benefício fiscal.'],
+['ARF','Fundo onde a previdência continua investida depois de se aposentar.'],
+],
+glPT:[
+['Mais-valia','Ganho de capital na venda de um ativo. Categoria G do IRS.'],
+['Taxa autónoma','Alíquota fixa de 28%, separada das outras rendas.'],
+['Englobamento','Somar os ganhos às outras rendas e pagar pela alíquota da faixa.'],
+['Anexo J','Anexo do IRS para rendas e contas no exterior.'],
+['Anexo G','Anexo do IRS para ganhos de capital.'],
+['PPR','Plano Poupança Reforma, com dedução no IRS.'],
+]
+};
+
+/* =====================================================================
+   CONTENT — ENGLISH
+   ===================================================================== */
+const EN = {
+common:[
+{ id:'basicos', icon:'🧱', title:'The basics', sub:'Compound interest, risk and where to start', body:`
+<h4>Before you invest</h4>
+<ul>
+<li><b>Emergency fund</b> — 3 to 6 months of expenses in a savings account you can access any time.</li>
+<li><b>No expensive debt</b> — credit cards or personal loans at 10–20% cost more than the market usually returns.</li>
+</ul>
+<h4>Compound interest</h4>
+<p>Gains earn more gains. €200/month for 30 years at 7% a year grows to about <b>€240,000</b>, of which only €72,000 came out of your pocket. Starting early beats starting big.</p>
+<h4>Risk and return</h4>
+<p>Higher expected returns always come with bigger swings. Shares can drop 30–50% in a bad year. Historically markets have recovered, but that is not guaranteed.</p>
+<h4>Diversification</h4>
+<p>Instead of buying 3 companies, you buy thousands at once through an ETF.</p>
+<div class="tip">💡 Money you will need in the next 3–5 years should not be in shares.</div>`},
+{ id:'etf', icon:'📊', title:'ETFs', sub:'What they are and how to choose', body:`
+<h4>What is an ETF?</h4>
+<p>An <b>Exchange Traded Fund</b> is a basket of shares (or bonds) that trades on the stock exchange like a single share. A global index ETF gives you small pieces of thousands of companies.</p>
+<h4>Why they are popular</h4>
+<ul>
+<li>Instant <b>diversification</b></li>
+<li><b>Low costs</b> — annual fee (TER) of 0.07%–0.25%</li>
+<li><b>Simplicity</b> — no need to pick companies</li>
+</ul>
+<h4>UCITS and domicile</h4>
+<p>In Europe you buy <b>UCITS</b> ETFs. Many are domiciled in Ireland (ISIN starts with <b>IE</b>), which cuts withholding tax on US dividends from 30% to 15% inside the fund.</p>
+<h4>Accumulating vs Distributing</h4>
+<ul>
+<li><b>Accumulating (Acc)</b> — dividends are reinvested automatically. No tax until you sell.</li>
+<li><b>Distributing (Dist)</b> — dividends are paid into your account and taxed every year.</li>
+</ul>
+<div class="tip">💡 In both Portugal and Ireland, <b>accumulating</b> ETFs are usually the most efficient choice for the long term.</div>`},
+],
+ie:[
+{ id:'ie-etf', icon:'🧾', title:'ETF tax', sub:'38% exit tax and the 8-year rule', body:`
+<h4>Exit Tax: 38%</h4>
+<p>In Ireland, gains on European ETFs don't pay CGT — they pay <b>Exit Tax</b>, cut from 41% to <b>38%</b> on 1 January 2026. Distributions from distributing ETFs are also taxed at 38%.</p>
+<h4>Deemed Disposal (the 8-year rule)</h4>
+<p>Every 8 years after each purchase, Revenue <b>treats you as having sold</b> and you pay 38% on the gain — even though you sold nothing.</p>
+<p><b>Example:</b> you invest €10,000 in 2026. By 2034 it is worth €18,000. You pay 38% × €8,000 = <b>€3,040</b> and keep the ETF. That amount is credited when you finally sell.</p>
+<div class="warn">⚠️ Every purchase has its own 8-year date. Monthly investors must track each lot. Keep all your statements.</div>
+<div class="tip">🇮🇪 vs 🇵🇹 Portugal has no such rule: you only pay when you sell, and holding 8+ years excludes up to 30% of the gain from tax.</div>
+<h4>Losses don't offset</h4>
+<p>Losses on one ETF <b>cannot</b> be set against gains on another ETF, or against gains on shares.</p>
+<h4>How to file</h4>
+<p>On <b>Form 11</b>, usually by 31 October of the following year — even if you only have PAYE income.</p>
+<h4>New Investment Account</h4>
+<p>A personal account (similar to a UK ISA) is planned for 2027 for residents aged 18+ with a PPSN, one per person. Inside it there is <b>no deemed disposal</b>: a tax-free threshold and a low annual flat rate above it, handled by the provider. Check the figures set in Budget 2027.</p>`},
+{ id:'ie-acoes', icon:'📈', title:'Individual shares', sub:'CGT, dividends and losses', body:`
+<h4>Capital Gains Tax (CGT): 33%</h4>
+<p>Gains on selling individual shares (and US-domiciled ETFs) pay <b>CGT at 33%</b>.</p>
+<h4>Annual exemption: €1,270</h4>
+<p>The first <b>€1,270</b> of gains per year, per person, is tax-free. It doesn't carry over.</p>
+<h4>Losses offset</h4>
+<p>Unlike ETFs, losses reduce gains in the same year, and unused losses carry forward.</p>
+<h4>Payment deadlines</h4>
+<ul>
+<li>Gains January–November → pay by <b>15 December</b></li>
+<li>Gains in December → pay by <b>31 January</b></li>
+<li>File on Form 11 (or Form 12 if PAYE only) by 31 October the following year</li>
+</ul>
+<h4>Dividends</h4>
+<p>Taxed as <b>income</b>: marginal rate (20% or 40%) + USC + PRSI. Irish companies withhold 25%, which is credited. For US shares, fill in the <b>W-8BEN</b> so US withholding drops to 15%.</p>
+<div class="tip">💡 Shares pay less tax than ETFs (33% vs 38%) but carry much more risk. Nobody should pick shares just for the tax.</div>`},
+{ id:'ie-prsa', icon:'🏖️', title:'PRSA & pensions', sub:'Investing with tax relief', body:`
+<h4>What is a PRSA?</h4>
+<p><b>Personal Retirement Savings Account</b> — your own pension account. It moves with you between jobs and usually invests in funds.</p>
+<h4>Tax relief going in</h4>
+<p>Contributions come out of income before tax. At 40%, every <b>€100</b> costs you <b>€60</b>. At 20%, it costs €80.</p>
+<h4>Age limits (% of gross salary)</h4>
+<table><tr><th>Age</th><th>Limit</th></tr>
+<tr><td>Under 30</td><td>15%</td></tr><tr><td>30–39</td><td>20%</td></tr><tr><td>40–49</td><td>25%</td></tr>
+<tr><td>50–54</td><td>30%</td></tr><tr><td>55–59</td><td>35%</td></tr><tr><td>60+</td><td>40%</td></tr></table>
+<p>Salary counted up to <b>€115,000</b>.</p>
+<h4>Inside the PRSA</h4>
+<p>Growth is <b>tax-free</b> — no Exit Tax, no deemed disposal, no CGT.</p>
+<h4>At retirement</h4>
+<ul>
+<li>Access normally between ages <b>60 and 75</b>.</li>
+<li>Up to <b>25%</b> as a lump sum; the first <b>€200,000</b> of it is tax-free.</li>
+<li>The rest goes into an ARF or annuity and is taxed as income when drawn.</li>
+</ul>
+<div class="warn">⚠️ The money is locked until retirement.</div>
+<div class="tip">💡 If your employer contributes to a pension, always take the full match.</div>`},
+],
+pt:[
+{ id:'pt-mv', icon:'🧾', title:'Capital gains', sub:'28%, englobamento and the holding bonus', body:`
+<h4>28% rate</h4>
+<p>Gains on selling shares and ETFs ("mais-valias") pay a flat <b>28%</b> on the year's net result: gains minus losses.</p>
+<h4>No 8-year rule</h4>
+<p>Unlike Ireland, in Portugal <b>you only pay when you sell</b>. With accumulating ETFs you can hold for decades without paying anything along the way.</p>
+<h4>Holding-period bonus</h4>
+<p>For listed shares and ETFs, part of the gain is excluded from tax depending on how long you held:</p>
+<table><tr><th>Held</th><th>Excluded</th></tr>
+<tr><td>Under 2 years</td><td>0%</td></tr><tr><td>2 to 5 years</td><td>10%</td></tr>
+<tr><td>5 to 8 years</td><td>20%</td></tr><tr><td>8 years or more</td><td>30%</td></tr></table>
+<p><b>Example:</b> €5,000 gain on an ETF held 6 years → only €4,000 taxable → €1,120 tax instead of €1,400.</p>
+<div class="tip">🇵🇹 vs 🇮🇪 A striking contrast: in Ireland, holding an ETF for 8 years <b>triggers</b> tax (deemed disposal). In Portugal, holding 8 years gives a <b>30% discount</b> on the taxable gain.</div>
+<h4>Englobamento</h4>
+<p>You can choose to add gains to your other income and pay at your bracket rate. Only worth it if your marginal rate is <b>below 28%</b>. If you opt in, all gains for the year are included.</p>
+<div class="warn">⚠️ <b>Mandatory</b> englobamento: gains on assets held <b>under 365 days</b>, when total income reaches the top IRS bracket (about €86,600 in 2026).</div>
+<h4>Losses</h4>
+<p>Offset gains in the same year. They only carry forward (5 years) if you opt for englobamento.</p>
+<h4>How to file</h4>
+<ul>
+<li>IRS return between <b>1 April and 30 June</b> the following year.</li>
+<li>Portuguese broker → <b>Anexo G</b>. Foreign broker (DEGIRO, IBKR, Trading 212…) → <b>Anexo J</b>.</li>
+<li>Accounts at foreign brokers must also be listed on Anexo J.</li>
+<li><b>FIFO</b> rule: the oldest units are treated as sold first.</li>
+</ul>`},
+{ id:'pt-div', icon:'💸', title:'Dividends & interest', sub:'28% withholding and double taxation', body:`
+<h4>Dividends: 28%</h4>
+<p>Dividends and interest pay <b>28%</b>. At Portuguese banks and brokers it is withheld at source and you don't need to do anything else (unless you choose englobamento).</p>
+<h4>Foreign dividends</h4>
+<p>The company's country withholds its share first. Portugal charges the difference up to 28%.</p>
+<p><b>US example:</b> with the <b>W-8BEN</b> form the US withholds 15%; Portugal charges the remaining 13%. Without it the US withholds 30% — and reclaiming the excess is hard.</p>
+<h4>Deposit interest and Certificados</h4>
+<p>Also 28%, withheld automatically.</p>
+<div class="tip">💡 Accumulating ETFs pay you no dividends, so there is no yearly tax. All the tax is deferred to the sale — and benefits from the holding-period exclusion.</div>`},
+{ id:'pt-ppr', icon:'🏖️', title:'PPR', sub:'Portuguese retirement savings plan', body:`
+<h4>What is a PPR?</h4>
+<p>A <b>Plano Poupança Reforma</b> is a retirement savings product. It can be a fund (shares and bonds) or an insurance product. Choose by what it invests in and by its fees.</p>
+<h4>IRS deduction</h4>
+<p>You deduct <b>20%</b> of what you pay in straight off your tax bill, up to an age-based cap:</p>
+<table><tr><th>Age</th><th>Max deduction</th><th>Contribution to max it</th></tr>
+<tr><td>Under 35</td><td>€400</td><td>€2,000</td></tr>
+<tr><td>35 to 50</td><td>€350</td><td>€1,750</td></tr>
+<tr><td>Over 50</td><td>€300</td><td>€1,500</td></tr></table>
+<p>It is worth the same in every bracket, but counts toward the household overall deduction cap.</p>
+<h4>Penalty-free withdrawal</h4>
+<p>From age 60 or at retirement, and in cases like long-term unemployment, serious illness or disability — with contributions generally at least 5 years old. Gains are then taxed at about <b>8%</b>.</p>
+<div class="warn">⚠️ Withdrawing outside these conditions: you repay the deductions you received, plus <b>10% for each year</b> since, and gains are taxed more heavily.</div>
+<div class="tip">💡 For long horizons, a low-fee equity PPR combines the tax deduction with market growth.</div>`},
+],
+glossary:[
+['ETF','Exchange-traded fund that tracks an index or basket of assets.'],
+['UCITS','EU rules for funds sold to retail investors.'],
+['ISIN','12-character code identifying an investment.'],
+['TER','The fund\u2019s annual cost, as a % of the amount invested.'],
+['Acc / Dist','Accumulating (reinvests dividends) or Distributing (pays them out).'],
+['W-8BEN','US form that cuts withholding on dividends to 15%.'],
+['FIFO','First In, First Out: oldest units are treated as sold first.'],
+['Broker','Platform where you buy shares and ETFs.'],
+],
+glIE:[
+['Exit Tax','38% tax on gains from funds/ETFs in Ireland.'],
+['Deemed Disposal','Notional sale every 8 years, with Exit Tax on the gain.'],
+['CGT','Capital Gains Tax: 33% on share gains.'],
+['Form 11','Tax return for anyone with non-PAYE income.'],
+['PRSA','Personal pension account with tax relief.'],
+['ARF','Fund where your pension stays invested after retirement.'],
+],
+glPT:[
+['Mais-valia','Capital gain on selling an asset. IRS category G.'],
+['Taxa autónoma','Flat 28% rate, kept separate from other income.'],
+['Englobamento','Adding gains to other income and paying at your bracket rate.'],
+['Anexo J','IRS annex for foreign income and accounts.'],
+['Anexo G','IRS annex for capital gains.'],
+['PPR','Portuguese retirement savings plan with an IRS deduction.'],
+]
+};
+
+const CONTENT = { 'pt-PT':PT_PT, 'pt-BR':PT_BR, 'en':EN };
+
+/* =====================================================================
+   FONTES / SOURCES
+   ===================================================================== */
+const SRC = {
+  etfgl:   ['etf.ie – Irish ETF Glossary','https://etf.ie/glossary/'],
+  etfb26:  ['etf.ie – Budget 2026: ETF tax changes (38%)','https://etf.ie/blog/budget-2026-etf/'],
+  itdd:    ['Irish Times – ETF investors face another wait for deemed-disposal reform (set. 2026)','https://www.irishtimes.com/your-money/2026/09/06/irelands-etf-investors-face-another-wait-for-deemed-disposal-reform/'],
+  lsacct:  ['Law Society Gazette – Finance Bill to set out investment-account details (ago. 2026)','https://www.lawsociety.ie/gazette/top-stories/2026/august/finance-bill-to-set-out-investment-account-details/'],
+  lscgt:   ['Law Society of Ireland – Tax guide: Capital Gains Tax','https://www.lawsociety.ie/Solicitors/knowledge-base/practice-areas/Taxation/tax-guide/capital-gains-tax/'],
+  revprsa: ['Revenue – Tax relief on pension contributions (limits)','https://revenue.ie/en/jobs-and-pensions/pension/relief/tax-relief-limits.aspx'],
+  pf43:    ['Portal das Finanças – Artigo 43.º do CIRS (mais-valias)','https://info.portaldasfinancas.gov.pt/pt/informacao_fiscal/codigos_tributarios/cirs_rep/Pages/irs43.aspx'],
+  simula:  ['simula.pt – Simulador de mais-valias de ações e ETF 2026','https://simula.pt/simuladores/simulador_mais_valias_acoes'],
+  crn:     ['CRN Contabilidade – Mais-valias de ações e ETF no IRS 2026 (Anexo J)','https://crncontabilidade.pt/blog/mais-valias-de-acoes-e-etf-no-irs-2026-como-declarar-no-anexo-j/'],
+  sabado:  ['Sábado – Tributação de mais-valias e dividendos em Portugal (abr. 2026)','https://www.sabado.pt/c-studio/detalhe/20260401-110822-como-funciona-a-tributacao-de-mais-valias-e-dividendos-em-portugal'],
+  dfppr:   ['Doutor Finanças – PPR e benefícios fiscais','https://www.doutorfinancas.pt/investimentos/ppr-e-beneficios-fiscais-como-poupar-no-irs-enquanto-prepara-a-reforma/'],
+  decoppr: ['DECO Proteste – Como aproveitar o benefício fiscal do PPR','https://www.deco.proteste.pt/investe/reforma/fundos-ppr/dossies/tudo-sobre-ppr/como-aproveitar-beneficio-fiscal-ppr'],
+};
+const MOD_SRC = {
+  'etf':     ['etfgl'],
+  'ie-etf':  ['etfb26','etfgl','itdd','lsacct','pf43'],
+  'ie-acoes':['lscgt','etfgl'],
+  'ie-prsa': ['revprsa'],
+  'pt-mv':   ['pf43','simula','crn','etfgl'],
+  'pt-div':  ['sabado','simula'],
+  'pt-ppr':  ['dfppr','decoppr'],
+};
+const COUNTRY_SRC = { ie:['etfb26','etfgl','itdd','lsacct','lscgt','revprsa'],
+                      pt:['pf43','simula','crn','sabado','dfppr','decoppr'] };
+const srcList = keys => `<ul class="src">${keys.map(k =>
+  `<li><a href="${SRC[k][1]}" target="_blank" rel="noopener">${SRC[k][0]}</a></li>`).join('')}</ul>`;
+
+/* =====================================================================
+   ESTADO
+   ===================================================================== */
+let cfg = null;
+try { cfg = JSON.parse(localStorage.getItem('cfg')); } catch(e) {}
+function saveCfg(){ try { localStorage.setItem('cfg', JSON.stringify(cfg)); } catch(e) {} }
+
+const app = document.getElementById('app');
+const titleEl = document.getElementById('title');
+const backBtn = document.getElementById('backBtn');
+const setBtn = document.getElementById('setBtn');
+const FLAG = { ie:'🇮🇪', pt:'🇵🇹' };
+const LANGS = [['pt-PT','🇵🇹','Português (PT)'],['pt-BR','🇧🇷','Português (BR)'],['en','🇬🇧','English']];
+
+const T = () => UI[cfg.lang];
+const C = () => CONTENT[cfg.lang];
+
+function chrome(title, showBack){
+  titleEl.textContent = title;
+  backBtn.style.display = showBack ? 'block' : 'none';
+  backBtn.textContent = T().back;
+  setBtn.textContent = FLAG[cfg.country] + ' ⚙️';
+  document.getElementById('foot').textContent = T().foot;
+  document.documentElement.lang = cfg.lang;
+  window.scrollTo(0,0);
+}
+
+/* =====================================================================
+   VISTAS
+   ===================================================================== */
+function card(m, onclick){
+  return `<div class="card module" onclick="${onclick}">
+    <div class="icon">${m.icon}</div><div><h3>${m.title}</h3><p>${m.sub}</p></div></div>`;
+}
+
+function goHome(){
+  const t = T(), c = C();
+  chrome('💶 ' + t.appTitle, false);
+  app.innerHTML = `
+    <div class="section">${t.common}</div>
+    ${c.common.map(m => card(m, `openModule('${m.id}')`)).join('')}
+    <div class="section">${FLAG[cfg.country]} ${t.country[cfg.country]}</div>
+    ${c[cfg.country].map(m => card(m, `openModule('${m.id}')`)).join('')}
+    <div class="section">🛠️</div>
+    ${card({icon:'🧮', title:t.calcTitle, sub:t.calcSub}, 'openCalc()')}
+    ${card({icon:'📖', title:t.glTitle, sub:t.glSub}, 'openGlossary()')}
+    ${card({icon:'📚', title:t.srcTitle, sub:t.srcSub}, 'openSources()')}`;
+}
+
+function openSources(){
+  const t = T();
+  chrome('📚 ' + t.srcTitle, true);
+  app.innerHTML = `<div class="card"><h2>${FLAG[cfg.country]} ${t.country[cfg.country]}</h2>
+    ${srcList(COUNTRY_SRC[cfg.country])}</div>`;
+}
+
+function openModule(id){
+  const c = C();
+  const m = [...c.common, ...c.ie, ...c.pt].find(x => x.id === id);
+  chrome(m.icon + ' ' + m.title, true);
+  const keys = MOD_SRC[m.id];
+  app.innerHTML = `<div class="card lesson"><h2>${m.title}</h2>${m.body}
+    ${keys ? `<h4>📚 ${T().srcTitle}</h4>${srcList(keys)}` : ''}</div>`;
+}
+
+function openGlossary(){
+  const t = T(), c = C();
+  const list = [...c.glossary, ...(cfg.country === 'ie' ? c.glIE : c.glPT)]
+    .sort((a,b) => a[0].localeCompare(b[0]));
+  chrome('📖 ' + t.glTitle, true);
+  app.innerHTML = `<div class="card"><dl class="gl">
+    ${list.map(([k,d]) => `<dt>${k}</dt><dd>${d}</dd>`).join('')}</dl></div>`;
+}
+
+/* ---------- definições ---------- */
+let draft = null;
+function openSettings(first){
+  draft = cfg ? {...cfg} : { lang:'pt-PT', country:'ie' };
+  renderSettings(first);
+}
+function renderSettings(first){
+  const t = UI[draft.lang];
+  titleEl.textContent = '⚙️ ' + t.settings;
+  backBtn.style.display = first ? 'none' : 'block';
+  backBtn.textContent = t.back;
+  setBtn.style.display = 'none';
+  app.innerHTML = `
+    ${first ? `<div class="card">${t.welcome}</div>` : ''}
+    <div class="section">${t.lang}</div>
+    <div class="choice three">${LANGS.map(([code,flag,name]) =>
+      `<button class="${draft.lang===code?'active':''}" onclick="draft.lang='${code}';renderSettings(${!!first})">
+       <span class="big">${flag}</span>${name}</button>`).join('')}</div>
+    <div class="section">${t.where}</div>
+    <div class="choice">${['pt','ie'].map(k =>
+      `<button class="${draft.country===k?'active':''}" onclick="draft.country='${k}';renderSettings(${!!first})">
+       <span class="big">${FLAG[k]}</span>${t.country[k]}</button>`).join('')}</div>
+    <button class="btn" onclick="applySettings()">${first ? t.start : t.save}</button>`;
+}
+function applySettings(){
+  cfg = draft; saveCfg();
+  setBtn.style.display = 'block';
+  goHome();
+}
+
+/* =====================================================================
+   CALCULADORAS
+   ===================================================================== */
+const fmt = n => '€' + Math.round(n).toLocaleString(cfg.lang === 'en' ? 'en-IE' : cfg.lang);
+const num = id => parseFloat(document.getElementById(id).value) || 0;
+const field = (id,label,val,step) => `<label>${label}</label><input id="${id}" type="number" inputmode="decimal" value="${val}" step="${step||'any'}">`;
+
+function openCalc(tab){
+  const t = T();
+  const tabs = cfg.country === 'ie'
+    ? [['juros',t.tCompound],['dd',t.tDD],['prsa',t.tPRSA]]
+    : [['juros',t.tCompound],['mv',t.tMV],['ppr',t.tPPR]];
+  tab = tab || 'juros';
+  chrome('🧮 ' + t.calcTitle, true);
+  const forms = {
+    juros: field('a',t.initial,1000) + field('b',t.monthly,200) + field('c',t.ret,7) + field('d',t.years,20),
+    dd:    field('a',t.amount,10000) + field('b',t.ret,7),
+    prsa:  field('a',t.age,35) + field('b',t.salary,50000) + field('c',t.marg,40),
+    mv:    field('a',t.buy,10000) + field('b',t.sell,15000) + field('c',t.held,6),
+    ppr:   field('a',t.age,30) + field('b',t.yearly,2000),
+  };
+  app.innerHTML = `<div class="tabs">${tabs.map(([id,l]) =>
+      `<button class="${tab===id?'active':''}" onclick="openCalc('${id}')">${l}</button>`).join('')}</div>
+    <div class="card">${forms[tab]}<div class="result" id="res"></div></div>`;
+  app.querySelectorAll('input').forEach(i => i.addEventListener('input', () => calc(tab)));
+  calc(tab);
+}
+
+function calc(tab){
+  const t = T(), res = document.getElementById('res');
+  if (tab === 'juros'){
+    const P = num('a'), M = num('b'), r = num('c')/100/12, n = Math.round(num('d')*12);
+    let total = P; for (let k=0;k<n;k++) total = total*(1+r) + M;
+    const put = P + M*n;
+    res.innerHTML = `${t.final}: <b>${fmt(total)}</b><br>${t.invested}: ${fmt(put)}<br>${t.gain}: ${fmt(total-put)}
+      <p class="note">${t.beforeTax}</p>`;
+  }
+  if (tab === 'dd'){
+    const P = num('a'), val = P*Math.pow(1+num('b')/100, 8), gain = Math.max(0, val-P);
+    res.innerHTML = `${t.after8}: <b>${fmt(val)}</b><br>${t.gain}: ${fmt(gain)}<br>${t.taxDue}: <b>${fmt(gain*0.38)}</b>
+      <p class="note">${t.ddNote}</p>`;
+  }
+  if (tab === 'prsa'){
+    const age = num('a'), sal = Math.min(num('b'), 115000), rate = num('c') >= 40 ? 0.4 : 0.2;
+    const pct = age<30?.15 : age<40?.20 : age<50?.25 : age<55?.30 : age<60?.35 : .40;
+    const max = sal*pct;
+    res.innerHTML = `${t.prsaMax}: <b>${fmt(max)}${t.perYear}</b> (${Math.round(pct*100)}% ${t.ofSalary})<br>
+      ${t.relief}: ${fmt(max*rate)}<br>${t.realCost}: <b>${fmt(max*(1-rate))}</b><p class="note">${t.prsaNote}</p>`;
+  }
+  if (tab === 'mv'){
+    const gain = num('b') - num('a'), yrs = num('c');
+    const ex = yrs>=8 ? .30 : yrs>=5 ? .20 : yrs>2 ? .10 : 0;
+    const taxable = Math.max(0, gain*(1-ex));
+    res.innerHTML = `${t.gain}: ${fmt(gain)}<br>${t.excl}: ${Math.round(ex*100)}%<br>
+      ${t.taxable}: ${fmt(taxable)}<br>${t.tax28}: <b>${fmt(taxable*0.28)}</b><p class="note">${t.mvNote}</p>`;
+  }
+  if (tab === 'ppr'){
+    const age = num('a'), put = num('b');
+    const cap = age<35 ? 400 : age<=50 ? 350 : 300;
+    const ded = Math.min(put*0.2, cap);
+    res.innerHTML = `${t.deduction}: <b>${fmt(ded)}</b> (max ${fmt(cap)})<br>
+      ${put*0.2 < cap ? `${t.toMax} ${fmt(cap/0.2)}` : ''}<p class="note">${t.pprNote}</p>`;
+  }
+}
+
+/* =====================================================================
+   ARRANQUE
+   ===================================================================== */
+if (cfg && UI[cfg.lang] && cfg.country) goHome();
+else openSettings(true);
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+</script>
+</body>
+</html>
