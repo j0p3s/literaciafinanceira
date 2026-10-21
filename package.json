@@ -1,0 +1,17 @@
+{
+  "name": "literaciafinanceira",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Literacia financeira para quem investe em Portugal e na Irlanda (PWA estática).",
+  "scripts": {
+    "test": "node --test",
+    "serve": "python3 -m http.server 8080",
+    "check-links": "node scripts/check-links.mjs"
+  },
+  "devDependencies": {
+    "jsdom": "^26.1.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

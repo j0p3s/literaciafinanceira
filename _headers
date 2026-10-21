@@ -1,0 +1,17 @@
+# Cabeçalhos para o Netlify (ignorado por outros alojamentos estáticos).
+# O service worker e o HTML têm de ser sempre revalidados, senão as atualizações demoram a chegar.
+
+/sw.js
+  Cache-Control: no-cache
+  Service-Worker-Allowed: /
+
+/index.html
+  Cache-Control: no-cache
+
+/manifest.json
+  Cache-Control: no-cache
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
