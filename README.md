@@ -80,3 +80,6 @@ Ainda não definida: sem licença, o código fica com todos os direitos reservad
 **Investir com cabeça** ("Invest with your head") is a static, offline-capable PWA teaching personal finance for investors in **Portugal** and **Ireland** — ETF taxation (exit tax, 8-year deemed disposal), the proposed Irish Investment Account, PRSA and PPR, Portuguese capital-gains rules, broker choice, scam red flags, and a set of calculators. UI in pt-PT, pt-BR and English.
 
 It is educational, **not financial or tax advice**. All tax numbers live in [`js/rules.js`](js/rules.js); Irish Budget 2027 changes are marked as *proposals* pending the Finance (No. 2) Bill 2026. No build step: `npm ci && npm test` runs the unit, content and jsdom tests; `npm run serve` serves the site locally.
+
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/j0p3s)
